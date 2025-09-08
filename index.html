@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AKASH  Resume Builder</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+      background: #111;
+      color: #fff;
+    }
+    .sidebar {
+      width: 280px;
+      background: #1a1a1a;
+      padding: 15px;
+      overflow-y: auto;
+    }
+    .sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .sidebar input, .sidebar select, .sidebar button, .sidebar textarea {
+      width: 100%;
+      margin: 8px 0;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+    }
+    .editor {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #222;
+      overflow-y: auto;
+    }
+    #resume {
+      width: 800px;
+      background: #fff;
+      color: #000;
+      padding: 30px;
+      border-radius: 12px;
+      transition: all 0.3s ease-in-out;
+    }
+    #resume h1, #resume h2, #resume p {
+      margin: 8px 0;
+    }
+    .download-options button {
+      margin-top: 10px;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+    .photo-preview {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: #ccc;
+      overflow: hidden;
+      margin: 10px auto;
+    }
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Resume Editor</h2>
+    <label>Full Name:</label>
+    <input type="text" id="nameInput" placeholder="Enter your name">
+
+    <label>Job Title:</label>
+    <input type="text" id="titleInput" placeholder="Your job title">
+
+    <label>About Me:</label>
+    <textarea id="aboutInput" placeholder="Write about yourself"></textarea>
+
+    <label>Font:</label>
+    <select id="fontSelect">
+      <option value="Arial">Arial</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Tahoma">Tahoma</option>
+      <option value="Verdana">Verdana</option>
+    </select>
+
+    <label>Font Size:</label>
+    <input type="number" id="fontSizeInput" min="10" max="40" value="16">
+
+    <label>Font Color:</label>
+    <input type="color" id="fontColorInput" value="#000000">
+
+    <label>Background Color:</label>
+    <input type="color" id="bgColorInput">
+
+    <label>Text Alignment:</label>
+    <select id="textAlignSelect">
+      <option value="left">Left</option>
+      <option value="center">Center</option>
+      <option value="right">Right</option>
+      <option value="justify">Justify</option>
+    </select>
+
+    <label>Upload Photo:</label>
+    <input type="file" id="photoInput" accept="image/*">
+
+    <div class="download-options">
+      <button onclick="downloadPDF()">📄 Download PDF</button>
+      <button onclick="downloadWord()">📝 Download Word</button>
+      <button onclick="downloadHTML()">🌐 Download HTML</button>
+      <button onclick="downloadZIP()">📦 Download ZIP</button>
+    </div>
+  </div>
+
+  <div class="editor">
+    <div id="resume">
+      <div class="photo-preview" id="photoPreview"></div>
+      <h1 id="name">Your Name</h1>
+      <h2 id="title">Your Job Title</h2>
+      <p id="about">This is your about me section. Edit from the left panel.</p>
+    </div>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <script>
+    // Live Editing
+    document.getElementById("nameInput").addEventListener("input", e => {
+      document.getElementById("name").innerText = e.target.value || "Your Name";
+    });
+    document.getElementById("titleInput").addEventListener("input", e => {
+      document.getElementById("title").innerText = e.target.value || "Your Job Title";
+    });
+    document.getElementById("aboutInput").addEventListener("input", e => {
+      document.getElementById("about").innerText = e.target.value || "This is your about me section.";
+    });
+
+    document.getElementById("fontSelect").addEventListener("change", e => {
+      document.getElementById("resume").style.fontFamily = e.target.value;
+    });
+
+    document.getElementById("fontSizeInput").addEventListener("input", e => {
+      document.getElementById("resume").style.fontSize = e.target.value + "px";
+    });
+
+    document.getElementById("fontColorInput").addEventListener("input", e => {
+      document.getElementById("resume").style.color = e.target.value;
+    });
+
+    document.getElementById("bgColorInput").addEventListener("input", e => {
+      document.getElementById("resume").style.background = e.target.value;
+    });
+
+    document.getElementById("textAlignSelect").addEventListener("change", e => {
+      document.getElementById("resume").style.textAlign = e.target.value;
+    });
+
+    // Upload Photo
+    document.getElementById("photoInput").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          document.getElementById("photoPreview").innerHTML = `<img src="${evt.target.result}" alt="Profile">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Download PDF
+    function downloadPDF() {
+      const element = document.getElementById("resume");
+      html2pdf().from(element).save("resume.pdf");
+    }
+
+    // Download Word
+    function downloadWord() {
+      const content = document.getElementById("resume").outerHTML;
+      const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+      saveAs(blob, 'resume.doc');
+    }
+
+    // Download HTML
+    function downloadHTML() {
+      const content = document.getElementById("resume").outerHTML;
+      const blob = new Blob([content], { type: "text/html" });
+      saveAs(blob, "resume.html");
+    }
+
+    // Download ZIP
+    function downloadZIP() {
+      const zip = new JSZip();
+      const content = document.getElementById("resume").outerHTML;
+      zip.file("resume.html", content);
+      zip.generateAsync({ type: "blob" }).then(function(content) {
+        saveAs(content, "resume.zip");
+      });
+    }
+  </script>
+  
+</body>
+</html>
