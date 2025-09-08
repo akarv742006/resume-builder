@@ -3,6 +3,10 @@
 A simple Resume Builder web app made with **HTML, CSS, and JavaScript**.  
 You can edit your details, upload a photo, customize fonts and colors, and download your resume.
 
+## 🔗 Links
+- **Repository:** [GitHub Repo](https://github.com/akarv742006/resume-builder)  
+- **Live Demo:** [View Site](https://akarv742006.github.io/resume-builder/)  
+
 ## Features
 - Live editing of name, title, and about section  
 - Upload and preview profile photo  
